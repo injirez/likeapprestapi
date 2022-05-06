@@ -8,6 +8,7 @@ from .models import User
 from .serializers import LoginSerializer, UserSerializer, RegistrationSerializer, ActivitySerializer
 
 
+
 # TODO: SMS code check on registration here or/and serializer
 
 

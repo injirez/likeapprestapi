@@ -6,6 +6,12 @@ from django.conf import settings
 from django.db import models
 from django.core import validators
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.contrib.postgres.fields import ArrayField
+
+from phonenumber_field.modelfields import PhoneNumberField
+
+from .utils.cities import CITY_CHOICES
+from .utils.genders import GENDER_CHOICES, SEARCH_CHOICES
 
 
 class UserManager(BaseUserManager):
@@ -58,19 +64,56 @@ class User(AbstractBaseUser, PermissionsMixin):
     PermissionsMixin classes
     """
 
+
     username = models.CharField(db_index=True, max_length=32, unique=True)
 
-    # TODO: fields for city, phone_number, gender, in_search, pin_code, bool(visible), fk on posts
+    # TODO: fields for city, phone_number, gender, in_search, pin_code, bool(visible)
 
     email = models.EmailField(
         validators=[validators.validate_email],
         unique=True,
-        blank=False
+        blank=True
         )
 
     is_staff = models.BooleanField(default=False)
 
     is_active = models.BooleanField(default=True)
+
+    is_visible = models.BooleanField(default=True)
+
+    city = models.CharField(max_length=100, choices=CITY_CHOICES, blank=False)
+
+    phone_number = PhoneNumberField(unique=True, blank=False)
+
+    # Gives all choices if nothing was selected (default not working)
+    # @property
+    # def gender_default(self):
+    #     return self._get_choice_default(GENDER_CHOICES)
+    #
+    # @property
+    # def search_default(self):
+    #     return self._get_choice_default(SEARCH_CHOICES)
+    #
+    # gender = ArrayField(models.CharField(
+    #                                     max_length=20,
+    #                                     choices=GENDER_CHOICES,),
+    #                                     # dafault=gender_default,
+    #                                     # dafault=['Мужчина', 'Женщина', 'Другой вариант']
+    #                                     )
+    #
+    # in_search = ArrayField(models.CharField(
+    #                                         max_length=20,
+    #                                         choices=SEARCH_CHOICES),
+    #                                         # dafault=search_default,
+    #                                         # default=['Мужчин', 'Женщин', 'Другой вариант']
+    #                                         )
+
+    # May be more usefull
+    gender = models.CharField(max_length=50, blank=True)
+
+    in_search = models.CharField(max_length=50, blank=True)
+
+    pin_code = models.CharField(max_length=4, default='0000', blank=False)
 
     # Set email field for login
     USERNAME_FIELD = 'email'
@@ -80,8 +123,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     # Set manager for User obj
     objects = UserManager()
 
-    def __str__(self):
-        return self.username
+    # def __str__(self):
+    #     return self.username
 
     # if token already in request ??
     @property
@@ -106,3 +149,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         }, settings.SECRET_KEY, algorithm='HS256')
 
         return token
+
+    def _get_choice_default(self, choices: list) -> list:
+        return list(choice[1] for choice in choices)
+
+

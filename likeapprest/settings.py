@@ -25,7 +25,7 @@ SECRET_KEY = 'O2FV91Zww85lBaXOuUMLKXx9203k3klvRVt_PO9AcBjmYiNpEuCZ7mLCyHHvdFniDu
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'authentication',
     'rest_framework',
+    'phonenumber_field',
     'publications',
     'likeapp',
     'django_extensions',
@@ -108,10 +109,22 @@ WSGI_APPLICATION = 'likeapprest.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'anondate',
+        'HOST': 'localhost',
+        # 'HOST': 'postgres_db', #For docker
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'PORT': '5010'
+        # 'PORT': '5432' #For docker
     }
 }
 
